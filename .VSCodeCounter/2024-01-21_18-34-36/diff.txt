@@ -1,0 +1,60 @@
+Date : 2024-01-21 18:34:36
+Directory : j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor
+Total : 22 files,  -910 codes, -51 comments, -182 blanks, all -1143 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| XML      |          4 |        -30 |          0 |          0 |        -30 |
+| JSON     |          2 |       -268 |          0 |          0 |       -268 |
+| Python   |         16 |       -612 |        -51 |       -182 |       -845 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                   |         22 |       -910 |        -51 |       -182 |     -1,143 |
+| ..                                                                                  |         22 |       -910 |        -51 |       -182 |     -1,143 |
+| .. (Files)                                                                          |          4 |       -278 |          0 |         -1 |       -279 |
+| ..\.idea                                                                            |          4 |        -30 |          0 |          0 |        -30 |
+| ..\.idea (Files)                                                                    |          3 |        -24 |          0 |          0 |        -24 |
+| ..\.idea\inspectionProfiles                                                         |          1 |         -6 |          0 |          0 |         -6 |
+| ..\AI                                                                               |          4 |       -103 |        -12 |        -29 |       -144 |
+| ..\Animation                                                                        |          2 |       -148 |         -5 |        -42 |       -195 |
+| ..\Particles                                                                        |          2 |       -132 |         -8 |        -45 |       -185 |
+| ..\RPJ                                                                              |          6 |       -219 |        -26 |        -65 |       -310 |
+| ..\RPJ (Files)                                                                      |          1 |         -8 |         -1 |         -4 |        -13 |
+| ..\RPJ\Character                                                                    |          2 |        -87 |         -4 |        -29 |       -120 |
+| ..\RPJ\Dialogue                                                                     |          3 |       -124 |        -21 |        -32 |       -177 |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                            | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| j:\PythonProg\Pygame\GrotesqueEngine\.idea\GrotesqueEngine.iml                      | XML      |        -12 |          0 |          0 |        -12 |
+| j:\PythonProg\Pygame\GrotesqueEngine\.idea\inspectionProfiles\profiles_settings.xml | XML      |         -6 |          0 |          0 |         -6 |
+| j:\PythonProg\Pygame\GrotesqueEngine\.idea\misc.xml                                 | XML      |         -4 |          0 |          0 |         -4 |
+| j:\PythonProg\Pygame\GrotesqueEngine\.idea\modules.xml                              | XML      |         -8 |          0 |          0 |         -8 |
+| j:\PythonProg\Pygame\GrotesqueEngine\AI\FLoodFIllTest.py                            | Python   |        -28 |        -12 |         -4 |        -44 |
+| j:\PythonProg\Pygame\GrotesqueEngine\AI\State.py                                    | Python   |         -9 |          0 |         -3 |        -12 |
+| j:\PythonProg\Pygame\GrotesqueEngine\AI\States_machine.py                           | Python   |        -18 |          0 |         -5 |        -23 |
+| j:\PythonProg\Pygame\GrotesqueEngine\AI\fsm_learn.py                                | Python   |        -48 |          0 |        -17 |        -65 |
+| j:\PythonProg\Pygame\GrotesqueEngine\Animation\Animation.py                         | Python   |        -92 |         -1 |        -31 |       -124 |
+| j:\PythonProg\Pygame\GrotesqueEngine\Animation\Animation_json.py                    | Python   |        -56 |         -4 |        -11 |        -71 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GrotesqueController.py                         | Python   |         -1 |          0 |          0 |         -1 |
+| j:\PythonProg\Pygame\GrotesqueEngine\Particles\Particles_circle.py                  | Python   |        -49 |         -1 |        -19 |        -69 |
+| j:\PythonProg\Pygame\GrotesqueEngine\Particles\Particles_trail.py                   | Python   |        -83 |         -7 |        -26 |       -116 |
+| j:\PythonProg\Pygame\GrotesqueEngine\RPJ\Character\BaseCharacter.py                 | Python   |        -61 |         -3 |        -21 |        -85 |
+| j:\PythonProg\Pygame\GrotesqueEngine\RPJ\Character\Player.py                        | Python   |        -26 |         -1 |         -8 |        -35 |
+| j:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\DialiogueTest.py                  | Python   |        -34 |          0 |         -5 |        -39 |
+| j:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Dialogue.py                       | Python   |        -83 |        -21 |        -25 |       -129 |
+| j:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Inventory.py                      | Python   |         -7 |          0 |         -2 |         -9 |
+| j:\PythonProg\Pygame\GrotesqueEngine\RPJ\Grid.py                                    | Python   |         -8 |         -1 |         -4 |        -13 |
+| j:\PythonProg\Pygame\GrotesqueEngine\houseCalculator.py                             | Python   |         -9 |          0 |         -1 |        -10 |
+| j:\PythonProg\Pygame\GrotesqueEngine\test.json                                      | JSON     |        -87 |          0 |          0 |        -87 |
+| j:\PythonProg\Pygame\GrotesqueEngine\test_animaton.json                             | JSON     |       -181 |          0 |          0 |       -181 |
+| Total                                                                               |          |       -910 |        -51 |       -182 |     -1,143 |
++-------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

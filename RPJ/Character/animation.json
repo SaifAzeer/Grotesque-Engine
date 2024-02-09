@@ -1,0 +1,27 @@
+{
+    "player": {
+            "animationNumber": 3,
+            "animationOrder": {
+                "idle": 0,
+                "move_left": 1,
+                "move_right": 2,
+                "move_up": 3
+            },
+            "tileSize": [
+                50,
+                50
+            ],
+            "images":{
+                "idle_location" : "J:\\Tileset\\Character\\Complete set\\Set 1\\Character with sword and shield\\idle\\",
+                "movement_location": "J:\\Tileset\\Character\\Complete set\\Set 1\\Character with sword and shield\\walk\\",
+                "idle_down" : "idle down.png",
+                "idle_up" : "idle up.png",
+                "idle_right" : "idle right.png",
+                "idle_left" : "idle left.png",
+                "w_down" : "walk down.png",
+                "w_up" : "walk up.png",
+                "w_right" : "walk right.png",
+                "w_left" : "walk left.png"
+            }
+        }
+}

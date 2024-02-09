@@ -1,0 +1,10 @@
+LMC = select tiles and click buttons
+MMC = select tile on main
+ALT + LMC = delete tiles
+SHIFT + MMC = add to selected tiles 
+l = Add Tiles in line
+d = delete
+f = flood fill
+r = reset map location
+Return = Order AI
+Space = Save

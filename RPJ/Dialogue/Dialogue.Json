@@ -1,0 +1,13 @@
+{
+    "testDialogue":{
+        "img":"",
+        "text":"This is a test",
+        "flag":""
+    },
+
+    "testDialogueMultiple":{
+        "img":"",
+        "text":["This is a test"," and this is the second test"],
+        "flag":""
+    }
+}

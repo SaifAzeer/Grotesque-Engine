@@ -1,0 +1,38 @@
+Animation json
+
+EXAMPLE
+
+{
+    "player": {
+            "animationNumber": 4,
+            "animationOrder": {
+                "idle": 0,
+                "move_left": 1,
+                "move_right": 2,
+                "move_up": 3
+            },
+            "tileSize": [
+                50,
+                50
+            ],
+            "images":{
+                "idle_location" : "J:\\Tileset\\Character\\Complete set\\Set 1\\Character with sword and shield\\idle\\",
+                "movement_location": "J:\\Tileset\\Character\\Complete set\\Set 1\\Character with sword and shield\\walk\\",
+                "idle_down" : "idle down",
+                "idle_top" : "idle top",
+                "idle_right" : "idle right",
+                "idle_left" : "idle left",
+                "m_down" : "walk down",
+                "m_top" : "walk top",
+                "m_right" : "walk right",
+                "m_left" : "walk left"
+            }
+        }
+}
+
+DISPLAY
+"name":{
+    img:"background image",
+    txt:""
+    flag:"special effects when display text, like vibrating"
+}
