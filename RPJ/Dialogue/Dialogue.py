@@ -15,19 +15,19 @@ class DialogueContainer():
 
 class DialogueType(int,Enum):
     singleDialogueLine = 0
-    multipleDialogueTimer = 1
+    multipleDialogueTimer = 1 # when npc is talking in background
     multipleDialogue = 2
     noDialogue = 3 # use when there is nothing to show
     
 
 
 class Dialogue:
-    def __init__(self,img:str = None):
-        self.surface = Surface((50,50))
+    def __init__(self):
+        self.surface = Surface((500,50))
         self.surface.fill((150,150,150))
-        self.d_dialogueContainer : dict(str,DialogueContainer) = {}
+        self.d_dialogueContainer : dict[str,DialogueContainer] = {}
         self.length_dialogueContainer : int
-        self.ImportJson()
+        self.__ImportJson()
 
         self._font = font.SysFont("arial",15)
         self.startRender = False
@@ -39,27 +39,37 @@ class Dialogue:
         self.showDialogueSeconds :int = 0
         self.dialogueName : str = ""
 
+        self.firstIteraion = -1 # multipleDialogueTimer.. render first iteration then start check timer
 
     def Render(self,display:Surface,location:list[int],textLocation=[10,10])->None:
         display.blit(self.surface,location)
         self.surface.fill((150,150,150))
-        if self.startRender and self.text_surface:
+        if self.startRender and self.text_surface :
             self.surface.blit(self.text_surface,textLocation)
     
     def Update(self):
         if self.showDialogueType == DialogueType.multipleDialogueTimer:
             clock = time.time()
-            if clock - self.currentTime > self.showDialogueSeconds: # automatically go next dialogue every 2 second
+            self.startRender = True
+            if self.firstIteraion == -1:
                 self.Go_next_dialogue()
                 self.currentTime = clock
                 self.text_surface = self._font.render(self.d_dialogueContainer[self.dialogueName].text[self.current_iteration],True,(10,30,1))
-            self.startRender = True
+                self.firstIteraion = 0
+            if clock - self.currentTime > self.showDialogueSeconds: # automatically go next dialogue every 2 second
+                self.Go_next_dialogue()
+                self.currentTime = clock
+                self.text_surface = self._font.render(self.d_dialogueContainer[self.dialogueName].text[self.current_iteration],True,(10,30,1))            
+                #close the dialogue afther the end of iteration
+                self.firstIteraion +=1
+                if self.firstIteraion  == self.length_dialogueContainer +1 :          
+                    self.Close()
         
         elif self.showDialogueType == DialogueType.multipleDialogue:
             self.text_surface = self._font.render(self.d_dialogueContainer[self.dialogueName].text[self.current_iteration],True,(10,30,1))
     
     
-    def Animate(self)->None:
+    def __Animate(self)->None:
         pass
 
     def Go_next_dialogue(self) -> int:
@@ -73,6 +83,7 @@ class Dialogue:
         self.showDialogueSeconds = seconds
         self.dialogueName = dialogueName
         self.showDialogueType = DialogueType.multipleDialogueTimer
+        self.firstIteraion = -1
         
     def Show_single_dialogue(self,dialogueName) -> None:
         '''Use when there is only 1 dialogue text '''
@@ -94,16 +105,13 @@ class Dialogue:
     def Skip(self)->None:
         pass
 
-    def ImportJson(self)->bool:
+    def __ImportJson(self)->bool:
         with open("J:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Dialogue.json",'r') as f:
             d_json = jsonLoad(f)
             for key,value in d_json.items():
                 dialogueContainer = DialogueContainer(key,value["img"],value["text"],value["flag"])
-
                 self.d_dialogueContainer[key] = dialogueContainer
             self.length_dialogueContainer = len(self.d_dialogueContainer) - 1
-            return True
-        return False
 
 
 
@@ -119,7 +127,7 @@ class Dialogue:
 #            exit()
 #        if event.type == pygame.KEYDOWN:
 #            if event.key == pygame.K_SPACE:
-#                dialogue.Show_single_dialogue("testDialogue")
+#                dialogue.Show_multiple_dialogue_timer("testDialogueMultiple")
 #            elif event.key == pygame.K_RETURN:
 #                dialogue.Close()
 #        

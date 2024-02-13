@@ -55,7 +55,7 @@ class BaseCharacter:
         self.mana: int
         # ect.....
 
-        # self.dialogue = Dialogue()
+        self.dialogue = Dialogue()
         self.grid = Grid()
         self.gridSize = self.grid.gridSize
         self.d_image = {}
@@ -170,21 +170,19 @@ class State_Idle(State):
         if self.character.isMoving:
             self.character.reload_animation_image_location(AnimationImageKey.movement_location)
             self.character.stateMachine.change_state(self.character.state_move)
-            if self.character.moveDirection == MovementDirection.up:
-                self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_up]
-            if self.character.moveDirection == MovementDirection.down:
-                self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_down]
-            if self.character.moveDirection == MovementDirection.left:
-                self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_left]
-            if self.character.moveDirection == MovementDirection.right:
-                self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_right]
-
-            self.character.reloadAnimation()
-        
+               
 
     def Exit(self):
         print("exiting Idle State")
-
+        if self.character.moveDirection == MovementDirection.up:
+            self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_up]
+        if self.character.moveDirection == MovementDirection.down:
+            self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_down]
+        if self.character.moveDirection == MovementDirection.left:
+            self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_left]
+        if self.character.moveDirection == MovementDirection.right:
+            self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_right]
+        self.character.reloadAnimation()
 
 class State_Movement(State):
     def __init__(self, character):
@@ -204,7 +202,7 @@ class State_Movement(State):
                 self.character.nextGridPosition = self.character.gridPosition
                 self.character.gridPosition = self.character.gridPosition + self.character.move_dir_vec
                 self.character.move_dir_vec = Vector2(0,0)
-
+                #change direction when previous animation was moving animation
                 if self.character.moveDirection == MovementDirection.up:
                     self.character.animation_image = self.character.d_animation[AnimationImageKey.walk_up]
                 if self.character.moveDirection == MovementDirection.down:
