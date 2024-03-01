@@ -34,7 +34,7 @@ class MovementDirection(int,Enum):
 
 
 class BaseCharacter:
-    def __init__(self, display,imageName):
+    def __init__(self, display,imageName,dialogueJson):
         # self.image = pyImage.load(image)
         self.display = display
         #self.image = Surface((50, 50))
@@ -55,7 +55,7 @@ class BaseCharacter:
         self.mana: int
         # ect.....
 
-        self.dialogue = Dialogue()
+        self.dialogue = Dialogue(dialogueJson)
         self.grid = Grid()
         self.gridSize = self.grid.gridSize
         self.d_image = {}

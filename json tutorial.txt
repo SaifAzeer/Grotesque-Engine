@@ -30,7 +30,12 @@ EXAMPLE
         }
 }
 
-DISPLAY
+DIALOGUE JSON
+'imageType { // general : nomal dialogue under buttle
+             // personal: bottom dialogue with character image at right
+    "general" : "image path"
+    "personal" : "image path"
+}
 "name":{
     img:"background image",
     txt:""

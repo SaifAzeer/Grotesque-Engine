@@ -1,12 +1,17 @@
 {
+    "imageType":{
+        "general" : "J:\\PythonProg\\Pygame\\GrotesqueEngine\\image\\Dialogue_container.png", 
+        "personal" : ""
+    },
+
     "testDialogue":{
-        "img":"",
+        "imgType":"general",
         "text":"This is a test",
         "flag":""
     },
 
     "testDialogueMultiple":{
-        "img":"",
+        "imgType":"personal",
         "text":["This is a test"," and this is the second test"],
         "flag":""
     }

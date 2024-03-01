@@ -8,7 +8,7 @@ display = pygame.display.set_mode((500, 500))
 
 class Player(BaseCharacter):
     def __init__(self):
-        super().__init__(display,"player")
+        super().__init__(display,"player","J:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Dialogue.json")
 
         self.location = self.grid.GetWorldLoc([1, 2])
         # self.gridPosition = [1,2]

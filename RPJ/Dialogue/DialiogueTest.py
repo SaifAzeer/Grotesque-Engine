@@ -12,7 +12,7 @@ player_x,player_y = 0,0
 speed = 5
 
 character = pygame.Surface((50,50))
-dialogue = Dialogue((100,100))
+dialogue = Dialogue("J:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Dialogue.json")
 while True:
     dialogue.Update()
     for event in pygame.event.get():
