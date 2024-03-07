@@ -138,10 +138,12 @@ class BaseCharacter:
 
     def Update(self) -> None:
         self.stateMachine.update()
+        self.dialogue.Update()
 
     def Render(self, display) -> None:
         #self.image.fill((100, 200, 100))
         self.animation.play(self.display,self.location)  
+        self.dialogue.Render(display)
         #display.blit(self.image, self.location)
    
 

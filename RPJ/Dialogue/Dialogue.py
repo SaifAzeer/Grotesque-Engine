@@ -28,7 +28,7 @@ class Dialogue:
         self.d_dialogueContainer : dict[str,DialogueContainer] = {}
         self.length_dialogueContainer : int
         self.d_image  = {} #str-image
-        self.location : list[int] # location of dialogue background image
+        self.location = [0,0] # location of dialogue background image
         self.textLocation :list[int] # location of text calculated to be in the middle of background image
         self.surfaceLocation :list[int] # location of dialogue background image
         self.__ImportJson(jsonFile)
@@ -72,17 +72,16 @@ class Dialogue:
         elif self.showDialogueType == DialogueType.multipleDialogue:
             if self.is_next_dialogue == False:
                 return
+            self.is_next_dialogue = False
             self.Go_next_dialogue()
             self.text_dialogue = self._font.render(self.d_dialogueContainer[self.dialogueName].text[self.current_iteration],True,(10,30,1))
             self.firstIteraion +=1
-            self.is_next_dialogue = False
             if self.firstIteraion  == self.length_dialogueContainer +1 :          
                self.Close()
 
 
-
-    def get_text_location(self):
-        width = self.text_surface.get_width() / 2
+    def get_text_location(self) -> None:
+        '''Calcalulate the text location to put in the middle of the dialogue '''
         height = self.text_surface.get_height() // 4
         self.textLocation = [self.location[0] + 10,self.location[1] + height]
 
@@ -90,18 +89,22 @@ class Dialogue:
         pass
 
     def Go_next_dialogue(self) -> int:
+        '''Iterate through the dialogue list received from json'''
         if self.current_iteration < self.length_dialogueContainer:
             self.current_iteration += 1
         return self.current_iteration
 
-    def Show_multiple_dialogue_timer(self,dialogueName:str,seconds:int = 2,surfType = "general",size = [300,100])->None:
+    def Show_multiple_dialogue_timer(self,dialogueName:str,location = [0,0],seconds:int = 2,surfType = "general",size = [300,100])->None:
         '''Use when there are multiple text that will show after selected amount of seconds'''    
+        if self.current_iteration != -1: #do not go to next dialoge even if this function is called
+            return                       # only go to next dialogue with timer
+        self.dialogueName = dialogueName
+        self.location = location
+        self.showDialogueSeconds = seconds
         self.text_surface = self.d_image[surfType]
         self.text_surface = transform.scale(self.text_surface,size)
         self.get_text_location()
         #clock = time.time()
-        self.showDialogueSeconds = seconds
-        self.dialogueName = dialogueName
         self.showDialogueType = DialogueType.multipleDialogueTimer
         self.firstIteraion = -1
         
@@ -114,11 +117,12 @@ class Dialogue:
         self.startRender = True
         self.showDialogueType = DialogueType.singleDialogueLine
 
-    def Show_multiple_dialogue(self,dialogueName,surfType = "general",size = [300,100]) ->None:
+    def Show_multiple_dialogue(self,dialogueName,location = [0,0],surfType = "general",size = [300,100]) ->None:
+        self.dialogueName = dialogueName
+        self.location = location
         self.text_surface = self.d_image[surfType]
         self.text_surface = transform.scale(self.text_surface,size)
         self.get_text_location()
-        self.dialogueName = dialogueName
         #self.text_dialogue = self._font.render(self.d_dialogueContainer[dialogueName].text,True,(10,30,1))
         self.startRender = True
         self.is_next_dialogue = True
@@ -128,9 +132,7 @@ class Dialogue:
         self.showDialogueType = DialogueType.noDialogue
         self.startRender = False
         self.current_iteration = -1
-
-    def Skip(self)->None:
-        pass
+        self.firstIteraion = -1
 
     def __ImportJson(self,jsonFile:str)->bool:
         with open(jsonFile,'r') as f:
@@ -150,24 +152,24 @@ class Dialogue:
 #----------------------------------------------------------------
 # TESTING
 #----------------------------------------------------------------
-pygame.init()
-surface = pygame.display.set_mode((600,600))
-background = Surface((600,600))
-background.fill((0,0,32))
-dialogue = Dialogue("J:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Dialogue.json")
-dialogue.location = [100,130]
-while True:
-    dialogue.Update()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                dialogue.Show_multiple_dialogue("testDialogueMultiple")
-            elif event.key == pygame.K_RETURN:
-                dialogue.Close()
-        
-    surface.blit(background,(0,0))  
-    dialogue.Render(surface)
-    
-    pygame.display.update()
+#pygame.init()
+#surface = pygame.display.set_mode((600,600))
+#background = Surface((600,600))
+#background.fill((0,0,32))
+#dialogue = Dialogue("J:\PythonProg\Pygame\GrotesqueEngine\RPJ\Dialogue\Dialogue.json")
+#dialogue.location = [100,130]
+#while True:
+#    dialogue.Update()
+#    for event in pygame.event.get():
+#        if event.type == pygame.QUIT:
+#            exit()
+#        if event.type == pygame.KEYDOWN:
+#            if event.key == pygame.K_SPACE:
+#                dialogue.Show_multiple_dialogue("testDialogueMultiple")
+#            elif event.key == pygame.K_RETURN:
+#                dialogue.Close()
+#        
+#    surface.blit(background,(0,0))  
+#    dialogue.Render(surface)
+#    
+#    pygame.display.update()

@@ -7,9 +7,9 @@ import pygame
 from sys import exit
 import Data.Constant
 from Grid import Grid
-from Data.Constant import DISPLAY_SIZE,GRID_NUMBER
+from Data.Constant import GRID_SIZE,GRID_NUMBER
 from Data.Constant import LEFT_SURFACE_SIZE,MAIN_SURFACE_SIZE
-from MyEncoder import MyEncoder, NoIndent
+from MyEncoder import MyEncoder, NoIndent,OneDictPerLine
 from Tiles import Tiles
 from Data.TileType import TileType
 from UI.UIManager import UIManager
@@ -17,7 +17,6 @@ from Data.Global import Global
 from AI import NextTileFinder
 from GruesomeMapEditor.AI import floodFill
 from UI.Button import Button
-
 
 #import numpy as np
 
@@ -41,8 +40,10 @@ class GruesomeMapMaker:
         #self.background.fill((200,200,200))
         self.mouseDown = False # use to move map 2
         self.background_position = [Data.Constant.LEFT_SURFACE_SIZE[0],0] 
-
-        self.l_action_surface= [] # list containing action editor collider surfaces to render
+        self._font = pygame.font.SysFont('arial', 15)
+        
+        self.d_action_rect = {} #collider name : list of action rectangles to render
+        self.actionName = "empty"
 
         self.main_grid = Grid()
         self.side_grid = Grid()
@@ -294,8 +295,6 @@ class GruesomeMapMaker:
         self.currentTile_image = new_img #swap tile
         self.currentTile.Load_image(self.currentTile_image)
 
-    
-
 
     #--------------------------------------------------------------------------------------
     def calculate_selection_rectangle(self) -> List[int]:
@@ -323,18 +322,44 @@ class GruesomeMapMaker:
 
         return [self.sr_topLeft,self.selection_rectangle_width,self.selection_rectangle_height]
     
+#----------------------------------------------------------------
+# Action Editor
+#----------------------------------------------------------------
 
-    def Create_action_rectangle(self) -> None:
+    def Create_action_rectangle(self,rect_name:str) -> None:
         '''Create rectangle that will be used as colliders in action editor'''    
         if self.uiManager.is_actionEditor_on: # if we are in the action editor menu   
-            rect_dimentions = self.calculate_selection_rectangle()
-            self.collider_surface = pygame.Surface([rect_dimentions[1],rect_dimentions[2]])
-            self.collider_surface.fill((0,0,32))
-            self.collider_surface.set_alpha(50)
-            l_surface = [self.collider_surface,rect_dimentions[0]]
-            #if l_surface not in self.l_action_surface:
-            self.l_action_surface.append(l_surface)
-            
+            rect_dimentions = self.calculate_selection_rectangle()      
+            rect_dimentions = self.Snap_action_rectangle_on_grid(rect_dimentions) # top left
+            rect_dimentions.append(self._font.render(rect_name,True,(100,100,100)))
+            # add multiple rectangle with same name 
+            if rect_name in self.d_action_rect:
+                self.d_action_rect[rect_name].append(rect_dimentions)
+            else:
+                l_newRect = [rect_dimentions]
+                self.d_action_rect[rect_name] = l_newRect
+
+
+    def Snap_action_rectangle_on_grid(self,rect_dimention)-> list[int]:
+        '''snap rectangle to grid , recalculate width and height based on amount of grid'''
+        topLeftGrid = self.main_grid.GetMainGridLoc( rect_dimention[0])
+        horTileAmount =rect_dimention[1] // GRID_SIZE[0]
+        width = horTileAmount * GRID_SIZE[0]
+        verTileAmount =rect_dimention[2] // GRID_SIZE[1]
+        height = verTileAmount * GRID_SIZE[1]
+        return [self.main_grid.GetMainWorldLoc(topLeftGrid),width, height]
+    
+
+    def Delete_action_Rectangle(self)-> None:
+        for i,j in self.d_action_rect.items(): 
+            for rectangle in j: # check if we click inside the rectangle
+                if self.mousePos[0] > rectangle[0][0] and self.mousePos[0] < rectangle[0][0] + rectangle[1]:
+                    if self.mousePos[1] > rectangle[0][1] and self.mousePos[1] < rectangle[0][1] + rectangle[2]:
+                        j.remove(rectangle)
+                        if len(j)==0: # remove keys from dictionary if there are no more action rectangles
+                            self.d_action_rect.pop(i)
+                        return
+#----------------------------------------------------------------
 
 
     def Select_tiles(self,topLeft,size) -> None:   
@@ -348,7 +373,7 @@ class GruesomeMapMaker:
             self.Find_selected_tiles(self.layer_3_tiles,topLeft,size)
 
         self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles
-
+        
 
     def Find_selected_tiles(self,layer,topLeft,size):
         '''Use in Select tiles to find and add in l_selected tiles'''
@@ -456,18 +481,17 @@ class GruesomeMapMaker:
             self.uiManager.Update()
             self.Events()
             self.Render()
-            #self.clock.tick(100)
-            #print(self.clock.get_fps())
 
             pygame.display.update()
 
-        
+
     #--------------------------------------------------------------------------------------
     
     def Render(self):
         self.mousePos = pygame.mouse.get_pos()
         self.background.blit(self.background_image,(0,0))
         self.main_surface.fill((50,50,50))
+        #self.left_surface.fill((80,80,80))
 
         self.display.blit(self.background,(Data.Constant.LEFT_SURFACE_SIZE[0],0))       
         self.display.blit(self.main_surface,self.background_position)
@@ -475,7 +499,6 @@ class GruesomeMapMaker:
         # tile preview
         if self.currentTile:
             self.currentTile.Mouse_tile_preview(self.display,self.main_grid,self.main_grid.GetMainGridLoc(self.mousePos))
-
         # tile line preview 
         if self.b_add_line:        
             self.preview_line_tile(self.mouse_click_pos,self.main_grid.GetMainGridLoc(self.mousePos))           
@@ -485,7 +508,7 @@ class GruesomeMapMaker:
                 else:
                     self.l_tile_preview[i].Render_other_colour(self.display,self.main_grid)
 
-        # render all tiles placd
+        # render all tiles placed
         for i in self.l_tiles:
             if i in self.l_selectedTiles:
                 i.Render_other_colour(self.display,self.main_grid)
@@ -494,14 +517,15 @@ class GruesomeMapMaker:
 
         # draw selection rectangle
         pygame.draw.rect(self.display,(20,20,20),pygame.Rect(self.sr_topLeft [0],self.sr_topLeft[1],self.selection_rectangle_width,self.selection_rectangle_height),2)
-        for i in self.l_action_surface:
-            self.display.blit(i[0],i[1])
+        for i,k in self.d_action_rect.items(): 
+            for j in k: 
+                pygame.draw.rect(self.display,(20,20,20),pygame.Rect(j[0][0],j[0][1],j[1],j[2]),2)
+                self.display.blit(j[3],j[0])
 
         self.display.blit(self.left_surface,(0,0))
-
          # render explorer when left click
-        #self.uiManager.Open_explorer(self.display)
-        self.uiManager.Render(self.display,self.mousePos)
+        self.uiManager.Render(self.display)
+        self.uiManager.Render_on_left_surface(self.display)
         pygame.display.update()
 
 
@@ -542,6 +566,8 @@ class GruesomeMapMaker:
             self.selection_rectangle_height = 0
 
         if mousePressed[2] == True:
+            if self.uiManager.is_actionEditor_on:
+                self.Delete_action_Rectangle()
             if keyPressed[pygame.K_LALT]: 
                 self.remove_tile()
         #-----------------------------------------------------------------------------------------------------------
@@ -553,11 +579,12 @@ class GruesomeMapMaker:
             elif event.type == pygame.MOUSEBUTTONDOWN:      
                 self.mouseDown = True
                 self.btn_folder_click_return = self.uiManager.ButtonClicked(self.mousePos)
-     
+                if self.uiManager.is_actionEditor_on: # check if action editor textbox is clicked
+                    self.uiManager.textBox.Mouse_click(event.pos)
                     
             elif event.type == pygame.MOUSEBUTTONUP:
                 if self.middle_mouse_down:
-                    self.Create_action_rectangle()
+                    self.Create_action_rectangle(self.actionName)
                     if self.uiManager.show_file_explorer:
                         self.uiManager.Select_tiles()
                 self.mouseDown = False
@@ -574,6 +601,12 @@ class GruesomeMapMaker:
                
             elif event.type == pygame.KEYDOWN:
                 self.number_pressed(event)
+                self.uiManager.Update_textBox(event)
+
+                if self.uiManager.is_actionEditor_on:
+                    self.actionName = self.uiManager.textBox.textResult
+                    if self.actionName == "": self.actionName = "empty"
+                    return
                 if event.key == pygame.K_ESCAPE:    
                     self.l_selectedTiles = []
                     self.tileAi.l_positions = []
@@ -733,6 +766,19 @@ class GruesomeMapMaker:
             if i not in self.l_tiles:
                 self.l_tiles.append(i)
 
+    def Update_action_dictionary_before_save(self):
+        '''remove surface from dictionary value'''
+        new_action_dictionary = self.d_action_rect.copy()   
+        for k,v in new_action_dictionary.items():
+            l_withoutSurface = v.copy()
+            for i in range(len(v)):
+                l_withoutSurface[i] = l_withoutSurface[i][:-1]
+                #convert global position to grid position
+                l_withoutSurface[i][0] = self.main_grid.GetMainGridLoc(l_withoutSurface[i][0])
+            new_action_dictionary[k] = l_withoutSurface
+        return new_action_dictionary
+
+
 
     #--------------------------------------------------------------------------------------
     def Save(self) ->None:
@@ -759,13 +805,16 @@ class GruesomeMapMaker:
         self.layer_1_image.clear()
         self.layer_2_image.clear()
         self.layer_3_image.clear()
-
         self.Prevent_image_dupplication_in_dict(self.p_map_1,self.layer_1_image)
         self.Prevent_image_dupplication_in_dict(self.map_2,self.layer_2_image)
         self.Prevent_image_dupplication_in_dict(self.map_3,self.layer_3_image)
+        d_actionWithoutSurface = self.Update_action_dictionary_before_save()
         to_dump = {
             "info":{"grid_size":Data.Constant.GRID_SIZE,
                     "grid_number":Data.Constant.GRID_NUMBER
+            },
+            "colliders":{
+                "collider_rect": OneDictPerLine(d_actionWithoutSurface) 
             },
             "layer_1":{"images": self.layer_1_image,
                         "map" : [NoIndent(elem) for elem in self.p_map_1]

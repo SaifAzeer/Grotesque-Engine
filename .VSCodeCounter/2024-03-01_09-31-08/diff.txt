@@ -1,0 +1,36 @@
+Date : 2024-03-01 09:31:08
+Directory : j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor
+Total : 9 files,  147 codes, -4 comments, 15 blanks, all 158 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Python   |          9 |        147 |         -4 |         15 |        158 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |          9 |        147 |         -4 |         15 |        158 |
+| . (Files)                                                                     |          4 |        105 |          7 |          8 |        120 |
+| Data                                                                          |          1 |          0 |         -1 |          0 |         -1 |
+| UI                                                                            |          4 |         42 |        -10 |          7 |         39 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                      | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\ActionEditor.py        | Python   |         11 |          0 |          4 |         15 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\Data\Constant.py       | Python   |          0 |         -1 |          0 |         -1 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\Deformed_map_reader.py | Python   |         18 |          0 |         -1 |         17 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\GruesomeMapMaker.py    | Python   |         47 |          3 |         -1 |         49 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\MyEncoder.py           | Python   |         29 |          4 |          6 |         39 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\UI\Button.py           | Python   |         -1 |          0 |          0 |         -1 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\UI\Explorer.py         | Python   |          0 |         -4 |         -1 |         -5 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\UI\Textbox.py          | Python   |         36 |          0 |          5 |         41 |
+| j:\PythonProg\Pygame\GrotesqueEngine\GruesomeMapEditor\UI\UIManager.py        | Python   |          7 |         -6 |          3 |          4 |
+| Total                                                                         |          |        147 |         -4 |         15 |        158 |
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

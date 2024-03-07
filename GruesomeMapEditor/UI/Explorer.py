@@ -13,7 +13,7 @@ class Explorer:
         self.l_file_explorer_buttons = []
 
         self.scroll_area = None
-
+        
         self.filePath = [] # add here when we browse filePath buttons
         self.currFolderPath = ""
         self.scroll_area = ScrollArea(self.l_file_explorer_buttons,(200,300))
@@ -27,12 +27,7 @@ class Explorer:
         display.blit(self.surface,(self.x,10))
         self.surface.fill((200,200,200))
         self.scroll_area.Render(self.surface)
-        #self.scroll_area.FillArea()
 
-        #for i in self.l_file_explorer_buttons:
-        #    self.surface.blit(i.surf,(i.rect.x,i.rect.y))
-        #    i.render_text()
-            
 
     def Add_scroll_area(self,dimention):
         self.scroll_area = ScrollArea(self.l_file_explorer_buttons,dimention)

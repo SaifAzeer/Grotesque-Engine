@@ -1,4 +1,3 @@
-from os import walk
 from pygame import Surface,font,image,transform
 from Data.TileType import Button_Type
 from Data.Global import Global ,ACTION_LAYER
@@ -13,10 +12,10 @@ class Button:
         self.layer = layer
         self.btn_type = btn_type
         self.surfSize = (150,40)
-        self.surf = Surface(self.surfSize)
-        self.surf.fill((244,168,150))
-        #self.surf = image.load("GruesomeMapEditor/Images/UI/woodenbutton1.png")
-        #self.surf = transform.scale(self.surf,self.surfSize)
+        #self.surf = Surface(self.surfSize)
+        #self.surf.fill((244,168,150))
+        self.surf = image.load("GruesomeMapEditor/Images/UI/btnLuxwhite.png")
+        self.surf = transform.scale(self.surf,self.surfSize)
         self.rect = self.surf.get_rect()
         #self.y = layer * 50 # calculate y coordinated of button
         self.position = [0,0]

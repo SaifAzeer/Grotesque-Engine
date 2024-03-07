@@ -17,5 +17,4 @@ UI_WIDGET_X_POS = 5 # all buttons, tiles minimum x positions
 
 MAP_SIZE = ((GRID_SIZE[0]*GRID_NUMBER[0]),(GRID_SIZE[1]*GRID_NUMBER[1]))
 
-#ROOTPOSITION = "GruesomeMapEditor"
 ROOTPOSITION = 'J:/Tileset'

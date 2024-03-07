@@ -1,3 +1,12 @@
+from dataclasses import dataclass
+
+@dataclass
+class RectangleContains:
+    name: str
+    width: int
+    height: int
+    topLeft: list[int] 
+
 
 class ActionEditor:
     def __init__(self):
@@ -14,4 +23,10 @@ class ActionEditor:
     def Remove_colliders(self,name,l_tiles):
         pass
 
+    
+    def Create_rect(self,name:str,dimentions:list[int]):
+        pass
+
+    def Remove_rect(self,name):
+        pass
     

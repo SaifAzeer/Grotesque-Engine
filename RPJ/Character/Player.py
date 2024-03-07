@@ -14,6 +14,7 @@ class Player(BaseCharacter):
         # self.gridPosition = [1,2]
         self.SetGridPosition(Vector2(1, 2))
         self.movementSpeed = 3
+        
 
 player = Player()
 
@@ -40,6 +41,8 @@ while True:
                 click_w = True
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 click_s = True
+            elif event.key == pygame.K_SPACE:
+                player.dialogue.Show_multiple_dialogue_timer("testDialogueMultiple",player.location)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
@@ -54,6 +57,8 @@ while True:
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 click_s = False
                 player.keyRelease()
+        
+
 
     if click_d:
         player.MoveRight()

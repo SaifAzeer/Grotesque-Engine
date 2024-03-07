@@ -17,6 +17,7 @@ from Data.Global import Global , ACTION_LAYER
 from Data.Constant import DISPLAY_SIZE,UI_WIDGET_X_POS
 from UI.Explorer import Explorer
 from Data.Global import Global
+from UI.Textbox import TextBox
 
 
 # TODO -> make a dictionaly for the images.. to make comparing faster
@@ -36,7 +37,7 @@ class UIManager:
         self.d_tileSet = {}
         self.d_border_tile = {} # in Ai to contain corner/border tiles
 
-        self._font = font.SysFont('century gothic', 15)
+        self._font = font.SysFont('yugothic', 15)
         self.text_surf = self._font.render("Object layer 1", True, (244,168,150))
         self.btn_y = DISPLAY_SIZE[1] - 80 # y coord of button and layout text
 
@@ -60,12 +61,13 @@ class UIManager:
 
         #multiple selection tiles 
         self.l_multilple_selected_tiles = []
+        self.textBox = TextBox((10,800))
+
+        
 
     def Setup_tile_icon(self,onleftMenu = True):
-        ''''''
         tilePosition_x = 0
-        tilePosition_y = 20
-        
+        tilePosition_y = 20    
         # chose which folder location we will use to get the tiles 
         currLocation = self.tile_location
         if onleftMenu == False: # we are in the explorer
@@ -189,7 +191,7 @@ class UIManager:
                         self.Fill_file_explorer()   
 
 
-    def Render(self,display,mousepos):      
+    def Render(self,display):      
         for i in self.l_tiles:         
             if i.image == self.currently_selected:
                 i.Render_other_colour_position(display,i.position,(250,252,50))
@@ -200,15 +202,13 @@ class UIManager:
         for i in self.l_layout_btn:
             i.Render(display)
         self.Open_explorer(display)
-        #if self.show_file_explorer:
-        #    self.explorer.scroll_area.FillArea()
-            #for i in self.explorer.l_file_explorer_buttons:
-            #    #self.explorer.surface.blit(i.surf,(i.rect.x,i.rect.y))
-            #    self.explorer.scroll_area.scroll_surface.blit(i.surf,(i.rect.x,i.rect.y))
-            #    i.render_text()
+    
+    def Render_on_left_surface(self,display):
+        if self.is_actionEditor_on:
+            self.textBox.Render(display)
         
 
-    def Update(self):
+    def Update(self) -> None:
         if Global.currentLayer == ACTION_LAYER:
             self.l_layout_btn = self.l_btn_layout_action
             self.l_layout_btn.append(self.btn_file_explorer)
@@ -218,8 +218,13 @@ class UIManager:
             self.l_layout_btn = self.l_btn_layout_main
             self.l_layout_btn.append(self.btn_file_explorer)
 
+    def Update_textBox(self, event)-> None:
+        '''return True because we want to find when the text is being updated to add to list'''
+        self.textBox.Update(event)
+        
+        
 
-    def Open_explorer(self,disp):
+    def Open_explorer(self,disp) -> None:
         if self.show_file_explorer:
             self.explorer.Render_file_explorer(disp)
             self.btn_back.Render(disp)
@@ -236,7 +241,7 @@ class UIManager:
         return False
 
 
-    def Update_layout_text(self,newText:str):
+    def Update_layout_text(self,newText:str) -> None:
         self.text_surf = self._font.render(newText, True, (244,168,150))
 
 
@@ -271,7 +276,7 @@ class UIManager:
             self.is_actionEditor_on = False
         else:
             self.l_btn_layout_main.append(button) # all buttons will be here i guess
-        self.btn_y -= 40
+        self.btn_y -= 50
 
 
     def File_explorer_button(self) -> Button:
