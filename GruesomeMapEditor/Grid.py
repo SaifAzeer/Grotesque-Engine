@@ -19,7 +19,7 @@ class Grid:
         return [location[0]//Data.Constant.GRID_SIZE[0],location[1]//Data.Constant.GRID_SIZE[1]]
     
     def GetWorldLoc(self,gridLoc):
-        return(gridLoc[0]*Data.Constant.GRID_SIZE[0],gridLoc[1]*Data.Constant.GRID_SIZE[1])
+        return [gridLoc[0]*Data.Constant.GRID_SIZE[0],gridLoc[1]*Data.Constant.GRID_SIZE[1]]
 
     def MapOffset(self,mapLoc,tileLoc):
         pass

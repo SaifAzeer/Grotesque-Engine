@@ -4,6 +4,7 @@ sysPath.append(path.dirname(path.abspath(path.join(__file__, "../../"))))
 
 from pygame import image as pyImage
 from pygame.math import Vector2
+from pygame.sprite import spritecollide,Group,Sprite
 from RPJ.Dialogue.Dialogue import Dialogue
 from RPJ.Grid import Grid
 from enum import Enum
@@ -11,6 +12,7 @@ from AI.State import State
 from AI.States_machine import States_machine
 from Animation.Animation import Animation
 from dataclasses import dataclass
+from GruesomeMapEditor.Deformed_map_reader import Colliders_surface
 
 @dataclass
 class AnimationImageKey:
@@ -33,12 +35,14 @@ class MovementDirection(int,Enum):
     right =4
 
 
-class BaseCharacter:
-    def __init__(self, display,imageName,dialogueJson):
+class BaseCharacter(Sprite):
+    def __init__(self, display,imageName,dialogueJson,walls):
+        super().__init__()
         # self.image = pyImage.load(image)
         self.display = display
         #self.image = Surface((50, 50))
         #_______________ Movement
+        self.walls = walls
         self.location: Vector2
         self.gridPosition: Vector2
         self.nextGridPosition = Vector2(0, 0)
@@ -49,6 +53,8 @@ class BaseCharacter:
         self.movementSpeed: int = 1
         self.directionVector: Vector2 = Vector2(0, 0)
         self.isMoving = False
+
+
         #_______________ Stats
         self.attackSpeed: int
         self.attackDamage: int
@@ -130,8 +136,7 @@ class BaseCharacter:
             if key == AnimationImageKey.movement_location:
                 continue
             self.d_image[key] =pyImage.load( self.d_animation[AnimationImageKey.idle_location]+ value)
-            
-        print(self.d_image)
+            print(self.d_image[key].get_height())
 
     def reload_animation_image_location(self,location):
         self.imgLoc = self.d_animation[location]
@@ -187,7 +192,7 @@ class State_Idle(State):
         self.character.reloadAnimation()
 
 class State_Movement(State):
-    def __init__(self, character):
+    def __init__(self, character:BaseCharacter):
         self.character = character
 
     def Start(self):
@@ -221,11 +226,28 @@ class State_Movement(State):
             if self.character.move_dir_vec == Vector2(0,0): # character stoped moving
                 self.character.reload_animation_image_location(AnimationImageKey.idle_location)
                 self.character.stateMachine.change_state(self.character.state_idle)
-
+        #print(self.Collided(self.character.walls))
+        print(self.Check_collision(self.character.walls))
 
     def Exit(self):
         pass
 
+    def Collided(self,walls:list[Group])-> str:
+        if walls == None or len(walls) == 0:
+            return
+        if spritecollide(self.character,walls,False):
+            return "waaaa"
+        return None
+
+    def Check_collision(self,walls:list[Colliders_surface]) ->str:
+        '''check collision between character and colliders'''
+        for wall in walls:
+            #print(wall.grid_position,end = " : ")
+            #print(self.character.gridPosition)
+            if self.character.gridPosition[1] < wall.grid_position[1] + wall.size[1] and self.character.gridPosition[1] > wall.grid_position[1]:
+                if self.character.gridPosition[0] < wall.grid_position[0] + wall.size[0] and self.character.gridPosition[0] > wall.grid_position[0]:
+                    return wall.name
+        return None
 
 class State_Attack(State):
     def __init__(self, character):

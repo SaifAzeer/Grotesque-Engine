@@ -18,6 +18,7 @@ from Data.Constant import DISPLAY_SIZE,UI_WIDGET_X_POS
 from UI.Explorer import Explorer
 from Data.Global import Global
 from UI.Textbox import TextBox
+from UI.ScrollArea import ScrollArea
 
 
 # TODO -> make a dictionaly for the images.. to make comparing faster
@@ -28,15 +29,16 @@ class UIManager:
         self.explorer_tile_location = self.tile_location
         self.explorer_selected_tile_location = self.tile_location
 
-        self.margin = 20
+        self.leftMargin = GRID_SIZE[0]
+        self.margin = 2
         self.layer_amount = 0
         self.l_layout_btn = []
         # list of tiles from tileset
         self.l_tiles = [] 
         self.l_explorer_tiles = []
-        self.d_tileSet = {}
+        self.d_tile_image_name = {}
         self.d_border_tile = {} # in Ai to contain corner/border tiles
-
+        self.d_tileSet= {}
         self._font = font.SysFont('yugothic', 15)
         self.text_surf = self._font.render("Object layer 1", True, (244,168,150))
         self.btn_y = DISPLAY_SIZE[1] - 80 # y coord of button and layout text
@@ -61,8 +63,17 @@ class UIManager:
 
         #multiple selection tiles 
         self.l_multilple_selected_tiles = []
-        self.textBox = TextBox((10,800))
-
+        self.textBox = TextBox((UI_WIDGET_X_POS,800))
+        self.scrollArea = ScrollArea(self.l_tiles,(160,200))
+        # set up initial buttons on screen when opening application
+        if Global.currentLayer == ACTION_LAYER:
+            self.l_layout_btn = self.l_btn_layout_action
+            self.l_layout_btn.append(self.btn_file_explorer)
+            self.is_actionEditor_on = True
+        else:
+            self.is_actionEditor_on = False
+            self.l_layout_btn = self.l_btn_layout_main
+            self.l_layout_btn.append(self.btn_file_explorer)
         
 
     def Setup_tile_icon(self,onleftMenu = True):
@@ -77,21 +88,24 @@ class UIManager:
         if glob.glob( currLocation+"/"+'*.png'):
             for filename in glob.glob(currLocation+"/"+'*.png'): 
                 imageName = filename.split('\\')[-1]
+
                 if self.Check_image_if_givenID(currLocation+"/"+imageName) == False:
-                    self.d_tileSet[self.d_counter] = currLocation+"/"+imageName
-   
+                    self.d_tile_image_name[self.d_counter] = currLocation+"/"+imageName
+                
                 # set tile position        
                 if tilePosition_x == 0: # first tile  make sure its beautfully to the left
-                    tilePosition_x = self.margin
+                    tilePosition_x = self.leftMargin
                 else: 
                     tilePosition_x += self.margin + GRID_SIZE[0]
-                if tilePosition_x >= LEFT_SURFACE_SIZE[0]: #reset position
-                    tilePosition_x = self.margin
+                if tilePosition_x >= LEFT_SURFACE_SIZE[0] - GRID_SIZE[0]: #reset position
+                    tilePosition_x = self.leftMargin
                     tilePosition_y += self.margin + GRID_SIZE[1]
                 
+                
                 t = Tiles( None,TileType.image,[tilePosition_x,tilePosition_y],self.d_counter,currLocation+"/"+imageName)
+                
                 self.d_counter +=1
-    
+                self.d_tileSet[self.d_counter] = t
                 if onleftMenu:# check for ai only when we have tiles at left menu not at explorer
                     self.l_tiles.append(t)
                     self.Find_AI_borders(currLocation,imageName)
@@ -99,9 +113,10 @@ class UIManager:
                     self.l_explorer_tiles.append(t)
 
             if onleftMenu:# only update selected tiles if we are trying to. ie select from left menu, not file explorer
-                self.currently_selected = self.d_tileSet[1]
+                self.currently_selected = self.d_tile_image_name[1]
+            self.scrollArea.Update_l_widget(self.l_tiles)
 
-    
+
     def Find_AI_borders(self,loc,imageName):
         # look for borders for ai to use
         for i in Tile_name_type:
@@ -111,14 +126,14 @@ class UIManager:
 
     def Switch_tile(self,number_pressed) -> str:
         ''' use dictionary to find tile based on number pressed'''
-        if number_pressed in self.d_tileSet:
-            self.currently_selected = self.d_tileSet[number_pressed]
+        if number_pressed in self.d_tile_image_name:
+            self.currently_selected = self.d_tile_image_name[number_pressed]
             return self.currently_selected
         else:
             return None
         
     def Check_image_if_givenID(self,img):
-        for i in self.d_tileSet.values():
+        for i in self.d_tile_image_name.values():
             if i == img:
                 return True
         return False
@@ -145,6 +160,16 @@ class UIManager:
                 self.explorer.filePath = []
                 self.Update_layout_text(i.text)
                 self.btn_click_return[i.btn_type]=i.on_click() # if we clicked something
+                # add button to layout for display
+                if Global.currentLayer == ACTION_LAYER:
+                    self.l_layout_btn = self.l_btn_layout_action
+                    self.l_layout_btn.append(self.btn_file_explorer)
+                    self.is_actionEditor_on = True
+                else:
+                    self.is_actionEditor_on = False
+                    self.l_layout_btn = self.l_btn_layout_main
+                    self.l_layout_btn.append(self.btn_file_explorer)
+
                 if self.btn_click_return != None: 
                     # click file explorer  btn
                     if i.btn_type == Button_Type.file_explorer :
@@ -154,7 +179,7 @@ class UIManager:
                         # itll search tile at the back position where it does not exist
                         Global.tilePos = self.explorer_selected_tile_location         
                         # reset position 
-                        self.explorer_tile_location = ROOTPOSITION    
+                        self.explorer_tile_location = ROOTPOSITION 
                         #show and hide explorer
                         if self.show_file_explorer == True:
                             self.show_file_explorer = False
@@ -171,7 +196,11 @@ class UIManager:
                     i.Set_click_Explorer("click_file",self.explorer.filePath)
                     self.explorer.currFolderPath += '\\'+i.text
                     self.btn_click_return[i.btn_type] = i.on_click() # result of subfolder when click this folder btn
-                    print(i.text)
+                    
+                    self.is_actionEditor_on = False
+                    self.l_layout_btn = self.l_btn_layout_main
+                    self.l_layout_btn.append(self.btn_file_explorer)
+                   
                     self.Show_tiles_file_explorer(i.text)
                     if self.btn_click_return[i.btn_type] != None:
                         self.Fill_file_explorer()     
@@ -192,12 +221,14 @@ class UIManager:
 
 
     def Render(self,display):      
+        # render tile icon on left surface
+        #self.scrollArea.Render_tiles(display)
         for i in self.l_tiles:         
             if i.image == self.currently_selected:
                 i.Render_other_colour_position(display,i.position,(250,252,50))
             else:
                 i.Render(display)
-        display.blit(self.text_surf,(30,self.btn_y-150))
+        display.blit(self.text_surf,(UI_WIDGET_X_POS,self.btn_y-200))
         #render buttons
         for i in self.l_layout_btn:
             i.Render(display)
@@ -209,14 +240,8 @@ class UIManager:
         
 
     def Update(self) -> None:
-        if Global.currentLayer == ACTION_LAYER:
-            self.l_layout_btn = self.l_btn_layout_action
-            self.l_layout_btn.append(self.btn_file_explorer)
-            self.is_actionEditor_on = True
-        else:
-            self.is_actionEditor_on = False
-            self.l_layout_btn = self.l_btn_layout_main
-            self.l_layout_btn.append(self.btn_file_explorer)
+        pass
+    
 
     def Update_textBox(self, event)-> None:
         '''return True because we want to find when the text is being updated to add to list'''

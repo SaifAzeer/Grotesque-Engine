@@ -25,11 +25,17 @@ class ScrollArea:
         self.scroll_surface.fill(self.colour)
         self.FillArea()
         display.blit(self.scroll_surface,(0,0))
-        
+
+    def Render_tiles(self,display):
+        self.scroll_surface.fill(self.colour)
+        display.blit(self.scroll_surface,(0,0))
+
     def Update_l_widget(self,l_new_widgets):
         self.l_widgets = []
         self.l_widgets = l_new_widgets
 
+    def Fill_tiles(self):
+        
     def FillArea(self):
         for i in self.l_widgets:
             self.scroll_surface.blit(i.surf,(i.rect.x,i.rect.y))

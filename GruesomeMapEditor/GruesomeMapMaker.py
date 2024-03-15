@@ -16,9 +16,6 @@ from UI.UIManager import UIManager
 from Data.Global import Global
 from AI import NextTileFinder
 from GruesomeMapEditor.AI import floodFill
-from UI.Button import Button
-
-#import numpy as np
 
 class GruesomeMapMaker:
     def __init__(self):
@@ -26,15 +23,17 @@ class GruesomeMapMaker:
         self.clock = pygame.time.Clock()
         self.display = pygame.display.set_mode(Data.Constant.DISPLAY_SIZE)
         pygame.display.set_caption('Gruesome Map Editor')
-
+        #make it a
         self.left_surface = pygame.Surface(Data.Constant.LEFT_SURFACE_SIZE)
         self.left_surface.fill((80,80,80))
+        self.left_surface_image = pygame.image.load("GruesomeMapEditor\\Images\\UI\\border_golden3.png")
+        self.left_surface_image = pygame.transform.scale(self.left_surface_image,Data.Constant.LEFT_SURFACE_SIZE)
 
         self.main_surface = pygame.Surface(Data.Constant.MAP_SIZE)
         self.main_surface.fill((50,50,50))
         self.main_surface_rect = self.main_surface.get_rect()
 
-        self.background_image = pygame.image.load("background.png")
+        self.background_image = pygame.image.load("GruesomeMapEditor\\Images\\background.png")
         self.background_image = pygame.transform.scale(self.background_image,MAIN_SURFACE_SIZE)
         self.background =  pygame.Surface(Data.Constant.MAIN_SURFACE_SIZE)
         #self.background.fill((200,200,200))
@@ -49,12 +48,13 @@ class GruesomeMapMaker:
         self.side_grid = Grid()
 
         self.l_tiles = []
+        self.l_tiles = set(self.l_tiles)
         self.l_selectedTiles = []
         self.l_tile_preview = []
-
         self.layer_1_tiles = []
         self.layer_2_tiles = []
         self.layer_3_tiles = []
+
         # map for each layer.. tile id at each loc
         #self.map_1 = [[0 for i in range(Data.Constant.GRID_NUMBER[0])] for j in range(Data.Constant.GRID_NUMBER[0])]
         #self.map_2 = [[0 for i in range(Data.Constant.GRID_NUMBER[0])] for j in range(Data.Constant.GRID_NUMBER[0])]       
@@ -74,10 +74,12 @@ class GruesomeMapMaker:
         self.floodFill = floodFill.FloodFill()
         
         self.displayFocus = "left" # if we click on main display or side one.. focus it
-        self.currentTile_image =None
+        self.currentTile_image = None
+        self.currentTile_ID :int = None
         self.currentTile = None
-        if len(self.uiManager.d_tileSet)>0:
-            self.currentTile_image = self.uiManager.d_tileSet[1]
+        if len(self.uiManager.d_tile_image_name)>0:
+            self.currentTile_image = self.uiManager.d_tile_image_name[1]
+            self.currentTile_ID = self.uiManager.d_tile_image_name[1]
             self.currentTile = Tiles(self.main_grid.GetMainGridLoc(pygame.mouse.get_pos()),TileType.image,pygame.mouse.get_pos(),0,self.currentTile_image)
 
         
@@ -117,24 +119,26 @@ class GruesomeMapMaker:
                     print('\n') 
 
     def delete_tile(self,l_del) -> None:
-        for i in l_del:
-            if Global.currentLayer ==1 :
+      
+        if Global.currentLayer == 1 :
+            for i in l_del:
                 if i in self.layer_1_tiles: # if no more tile with image we deleted.. not not add in json           
                     self.map_1[i.original_gridPos[1]][i.original_gridPos[0]] = 0
                     self.layer_1_tiles.remove(i)
-            
-            elif Global.currentLayer ==2 :
+                    self.l_tiles.remove(i)
+        elif Global.currentLayer == 2 :
+            for i in l_del:
                 if i in self.layer_2_tiles:
                     self.map_2[i.gridPos[1]][i.gridPos[0]] = 0
                     self.layer_2_tiles.remove(i)
-            
-            elif Global.currentLayer ==3 :
+                    self.l_tiles.remove(i)
+        elif Global.currentLayer == 3 :
+            for i in l_del:
                 if i in self.layer_3_tiles:
                     self.map_3[i.gridPos[1]][i.gridPos[0]] = 0
                     self.layer_3_tiles.remove(i)
-
-            if i in l_del:            
-                self.l_tiles.remove(i)
+                                     
+                    self.l_tiles.remove(i)
         self.l_selectedTiles = []
 
 
@@ -204,73 +208,83 @@ class GruesomeMapMaker:
                 self.change_tile(self.uiManager.Switch_tile(self.numberPressed))
 
 
+    # not implemented----------------------------------------------------------------
+    def add_on_tile_layer_map(self,layerNumber:Global.currentLayer,position:list[int],tile:Tiles) -> None:
+        '''Add tile to map layer map.. make it faster to add and remove tiles'''
+        if layerNumber == 1:
+            self.layer_1_tile_map[position[0]][position[1]] = tile
+
+    def delete_on_tile_layer_map(self,layerNumber:Global.currentLayer,position:list[int]) -> Tiles:
+        '''Delete tile from map layer map.. much faster to remove than traditional list'''
+        if layerNumber == 1:
+            if self.layer_1_tile_map[position[0]][position[1]] == None: return None #ignore.. its empty            
+            removedTile = self.layer_1_tile_map[position[0]][position[1]]
+            self.layer_1_tile_map[position[0]][position[1]] = None
+            return removedTile
+    #----------------------------------------------------------------
+        
+
     def create_tile(self,pos,img,types = TileType.image ) -> Tiles:
         '''create a new tile and add it to global list for display'''
-        #self.currentTile = Tiles(gridPos,types,pos,img)
-        id = 0
-        for ID, name in self.uiManager.d_tileSet.items():
-            if name == img:
-                # calculate position even when map have movec
-                # self.tile_map_movement is -ve then going right and +ve when going left. so we * by -ve 1
-                position = [pos[0] + self.tile_map_movement[0] *-1,pos[1]+ self.tile_map_movement[1]*-1]
-               
-                _gridPos = self.main_grid.GetMainGridLoc(position) 
-                tile = Tiles(_gridPos,types,position,ID,img)
-                tile.originalPos = position    
-                tile.Get_pos_by_grid(self.main_grid,self.tile_map_movement) # place grid at the right place when map move
-          
-                if Global.currentLayer == 1:
-                    self.Setup_layer_tile(tile,ID,_gridPos,self.layer_1_tiles,self.map_1)
+        # calculate position even when map have movec
+        # self.tile_map_movement is -ve then going right and +ve when going left. so we * by -ve 1
+        if self.currentTile_ID == None:return
+        if img == None: return
 
-                elif Global.currentLayer == 2:
-                    self.Setup_layer_tile(tile,ID,_gridPos,self.layer_2_tiles,self.map_2)
-
-                elif Global.currentLayer == 3:
-                    self.Setup_layer_tile(tile,ID,_gridPos,self.layer_3_tiles,self.map_3)
-
-                self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles   
+        position = [pos[0] + self.tile_map_movement[0] *-1,pos[1]+ self.tile_map_movement[1]*-1]
+        _gridPos = self.main_grid.GetMainGridLoc(position)
+     
+        tile = Tiles(_gridPos,types,position,self.currentTile_ID,img)
+        tile.originalPos = position    
+        tile.Get_pos_by_grid(self.main_grid,self.tile_map_movement) # place grid at the right place when map move
         
-                return tile
-            
+        if Global.currentLayer == 1:
+            self.Setup_layer_tile(tile,self.currentTile_ID,_gridPos,self.layer_1_tiles,self.map_1)
+        elif Global.currentLayer == 2:
+            self.Setup_layer_tile(tile,self.currentTile_ID,_gridPos,self.layer_2_tiles,self.map_2)
+        elif Global.currentLayer == 3:
+            self.Setup_layer_tile(tile,self.currentTile_ID,_gridPos,self.layer_3_tiles,self.map_3)
+        self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles    
+        #print(self.map_1)  
+        return tile
+        
 
 
     def create_tile_gridPos(self,pos,img,types = TileType.image) -> Tiles:
         '''create a new tile and add it to global list for display with gridPosition given'''
         #self.currentTile = Tiles(gridPos,types,pos,img)
         id = 0
-        for ID, name in self.uiManager.d_tileSet.items():
-            if name == img:
-                tile = Tiles(pos,types,self.main_grid.GetMainWorldLoc(pos),ID,img)
-                tile.originalPos = self.side_grid.GetMainWorldLoc(pos)               
-                tile.Get_pos_by_grid(self.main_grid,self.tile_map_movement) # place grid at the right place when map move
+        #for ID, name in self.uiManager.d_tile_image_name.items():
+        #    if name == img:
+        if self.currentTile_ID == None:
+            return
+        tile = Tiles(pos,types,self.main_grid.GetMainWorldLoc(pos),self.currentTile_ID,img)
+        tile.originalPos = self.side_grid.GetMainWorldLoc(pos)               
+        tile.Get_pos_by_grid(self.main_grid,self.tile_map_movement) # place grid at the right place when map move
 
-                if Global.currentLayer == 1:
-                    self.Setup_layer_tile(tile,ID,pos,self.layer_1_tiles,self.map_1)
+        if Global.currentLayer == 1:
+            self.Setup_layer_tile(tile,self.currentTile_ID,pos,self.layer_1_tiles,self.map_1)
 
-                elif Global.currentLayer == 2:
-                    self.Setup_layer_tile(tile,ID,pos,self.layer_2_tiles,self.map_2)
+        elif Global.currentLayer == 2:
+            self.Setup_layer_tile(tile,self.currentTile_ID,pos,self.layer_2_tiles,self.map_2)
 
-                elif Global.currentLayer == 3:
-                    self.Setup_layer_tile(tile,ID,pos,self.layer_3_tiles,self.map_3)
+        elif Global.currentLayer == 3:
+            self.Setup_layer_tile(tile,self.currentTile_ID,pos,self.layer_3_tiles,self.map_3)
 
-                self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles   
-                return tile
+        self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles   
+        return tile
             
     def Create_groupTiles(self):
         pass
 
     def UpdateMap(self,tile,id,pos):
         '''problems when calling.. need to investigate'''
-        if Global.currentLayer == 1:
-                        
+        if Global.currentLayer == 1:                     
             self.Setup_layer_tile(tile,id,pos,self.layer_1_tiles,self.map_1)
-
         elif Global.currentLayer == 2:
             self.Setup_layer_tile(tile,id,pos,self.layer_2_tiles,self.map_2)
-
         elif Global.currentLayer == 3:
             self.Setup_layer_tile(tile,id,pos,self.layer_3_tiles,self.map_3)
-
         self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles   
         return tile
 
@@ -278,7 +292,7 @@ class GruesomeMapMaker:
     def Setup_layer_tile(self,tile,ID,gridPos,l_tiles,map):
         '''use by create tile Func. to setup tiles.. ie: add in map list and tile list'''
         #add only witin main surface
-        if gridPos[0] > GRID_NUMBER[0] or gridPos[1] > GRID_NUMBER[1] or gridPos[0] < 0 or gridPos[1] < 0:
+        if gridPos[0] > GRID_NUMBER[0] -1 or gridPos[1] > GRID_NUMBER[1] - 1or gridPos[0] < 0 or gridPos[1] < 0:
             return    # check if we are checking within the map size... gridNumber and map size is same
         if tile not in l_tiles:   
             map[gridPos[1]][gridPos[0]] = ID
@@ -293,6 +307,7 @@ class GruesomeMapMaker:
     def change_tile(self,new_img : str):
         ''' selecting new tile from left layout'''
         self.currentTile_image = new_img #swap tile
+        self.currentTile_ID = self.uiManager.d_tile_image_name[self.currentTile_image]
         self.currentTile.Load_image(self.currentTile_image)
 
 
@@ -447,7 +462,6 @@ class GruesomeMapMaker:
                     i.position[0] += self.mousePos[0]- self.world_mouse_click[0] 
                 if self.mapMovement[1] !=0:
                     i.position[1] += self.mousePos[1]- self.world_mouse_click[1] 
-
             if self.mouseDown: # move map background surface
                 self.background_position[1] += self.mousePos[1] - self.world_mouse_click[1]
                 self.background_position[0] += self.mousePos[0] - self.world_mouse_click[0]
@@ -464,6 +478,7 @@ class GruesomeMapMaker:
             i.position =  i.originalPos
             i.Get_pos_by_grid(self.main_grid,self.tile_map_movement)
         
+
         self.background_position = [Data.Constant.LEFT_SURFACE_SIZE[0],0] 
         
 
@@ -491,6 +506,7 @@ class GruesomeMapMaker:
         self.mousePos = pygame.mouse.get_pos()
         self.background.blit(self.background_image,(0,0))
         self.main_surface.fill((50,50,50))
+        self.left_surface.blit(self.left_surface_image,(0,0))
         #self.left_surface.fill((80,80,80))
 
         self.display.blit(self.background,(Data.Constant.LEFT_SURFACE_SIZE[0],0))       
@@ -508,7 +524,7 @@ class GruesomeMapMaker:
                 else:
                     self.l_tile_preview[i].Render_other_colour(self.display,self.main_grid)
 
-        # render all tiles placed
+        # render all tiles placed on main surface
         for i in self.l_tiles:
             if i in self.l_selectedTiles:
                 i.Render_other_colour(self.display,self.main_grid)
@@ -526,7 +542,7 @@ class GruesomeMapMaker:
          # render explorer when left click
         self.uiManager.Render(self.display)
         self.uiManager.Render_on_left_surface(self.display)
-        pygame.display.update()
+        #pygame.display.update()
 
 
     #--------------------------------------------------------------------------------------
@@ -541,6 +557,9 @@ class GruesomeMapMaker:
         if type(onClick_return) == Tiles:
             self.currentTile = onClick_return
             self.currentTile_image = onClick_return.image
+            for key, value in self.uiManager.d_tile_image_name.items():
+                if value == self.currentTile_image:
+                    self.currentTile_ID = key
             self.currentTile.Load_image(self.currentTile_image)  # update preview Image
 
         #--------------------------------------------------------------------------------------------------------------
@@ -565,7 +584,7 @@ class GruesomeMapMaker:
             self.selection_rectangle_width = 0
             self.selection_rectangle_height = 0
 
-        if mousePressed[2] == True:
+        if mousePressed[2] == True: # left mouse click
             if self.uiManager.is_actionEditor_on:
                 self.Delete_action_Rectangle()
             if keyPressed[pygame.K_LALT]: 
@@ -598,7 +617,9 @@ class GruesomeMapMaker:
 
                 for i in self.l_tiles:
                     i.Get_pos_by_grid(self.main_grid,self.tile_map_movement)
-               
+                # TESTING ----------------------------------------------------------------
+
+                #------
             elif event.type == pygame.KEYDOWN:
                 self.number_pressed(event)
                 self.uiManager.Update_textBox(event)
@@ -672,42 +693,42 @@ class GruesomeMapMaker:
         #self.uiManager.show_file_explorer = False
         self.b_add_line = False
         removePos = self.main_grid.GetMainGridLoc(pygame.mouse.get_pos()) 
-        # calculate remove pos plus map movement and check for removed tiles. or itll not be removed   
-        if removePos in self.l_tiles:    
-            for i in self.l_tiles:
-                if i.gridPos == removePos:
-                    if Global.currentLayer == 1:
-                        if i in self.layer_1_tiles:
-                            self.layer_1_tiles.remove(i)
-                            self.map_1[i.original_gridPos[1]][i.original_gridPos[0]] = 0
-                    elif Global.currentLayer == 2:
-                        if i in self.layer_2_tiles:
-                            self.layer_2_tiles.remove(i)
-                            self.map_2[i.original_gridPos[1]][i.original_gridPos[0]] = 0
-                    elif Global.currentLayer == 3:
-                        if i in self.layer_3_tiles:
-                            self.layer_3_tiles.remove(i)
-                            self.map_3[i.original_gridPos[1]][i.original_gridPos[0]] = 0
 
-                    if i in self.l_selectedTiles:
-                        self.l_selectedTiles.remove(i)
-                    break
+        #TESTING HERE -------------------------------------------------------------
+        mapMovementPos = self.main_grid.GetMainGridLoc(self.mapMovement)
+        mapRemovePos = removePos[0] - mapMovementPos[0], removePos[1] - mapMovementPos[1]
+        #----------------------------------------------------------------------------
+
+        if removePos in self.l_tiles:             
+            if Global.currentLayer == 1:
+                for i in self.layer_1_tiles:
+                    if i.gridPos == removePos:
+                        self.layer_1_tiles.remove(i)
+                        self.map_1[i.original_gridPos[1]][i.original_gridPos[0]] = 0
+                        break
+            elif Global.currentLayer == 2:
+                for i in self.layer_2_tiles:
+                    if i.gridPos == removePos:
+                        self.layer_2_tiles.remove(i)
+                        self.map_2[i.original_gridPos[1]][i.original_gridPos[0]] = 0
+                        break
+            elif Global.currentLayer == 3:
+                for i in self.layer_3_tiles:
+                    if i.gridPos == removePos:
+                        self.layer_3_tiles.remove(i)
+                        self.map_3[i.original_gridPos[1]][i.original_gridPos[0]] = 0
+                        break
+            #if i in self.l_selectedTiles:
+            #    self.l_selectedTiles.remove(i)
         self.l_tiles = self.layer_1_tiles + self.layer_2_tiles + self.layer_3_tiles 
-
 
 
     def Add_tiles(self)-> None:
         if self.uiManager.show_file_explorer == False:
-            #if self.btn_folder_click_return == "folder changed":
-            #    if len(self.uiManager.d_tileSet)>0:
-            #        self.currentTile_image = self.uiManager.d_tileSet[1]
-                
-            #add tiles
             try:      
                 if self.b_add_line == False:
-                    #print(self.uiManager.d_tileSet)
                     self.currentTile = self.create_tile(list(self.mousePos),self.currentTile_image)
-                else:         
+                else:    # add tiles in line
                     for i in self.l_tile_preview:
                         self.create_tile(self.main_grid.GetMainWorldLoc(i.gridPos),self.currentTile_image)
                     self.mouse_click_pos = self.main_grid.GetMainGridLoc(self.mousePos)
@@ -748,7 +769,7 @@ class GruesomeMapMaker:
             # update map
             for i in self.l_tiles:
                 #print(i.image)
-                for ID, name in self.uiManager.d_tileSet.items():
+                for ID, name in self.uiManager.d_tile_image_name.items():
                     if name == i.image:
                         if Global.currentLayer == 1:
                             self.map_1[i.original_gridPos[1]][i.original_gridPos[0]] = ID
@@ -775,6 +796,9 @@ class GruesomeMapMaker:
                 l_withoutSurface[i] = l_withoutSurface[i][:-1]
                 #convert global position to grid position
                 l_withoutSurface[i][0] = self.main_grid.GetMainGridLoc(l_withoutSurface[i][0])
+                #recalculate global width and height to grid number.. its easier to calculate collision detection
+                l_withoutSurface[i][1] = l_withoutSurface[i][1] / GRID_SIZE[0]
+                l_withoutSurface[i][2] = l_withoutSurface[i][2] / GRID_SIZE[1]
             new_action_dictionary[k] = l_withoutSurface
         return new_action_dictionary
 
@@ -839,7 +863,7 @@ class GruesomeMapMaker:
                 if map[i][j] in l_image:
                     continue
                 num = map[i][j]
-                l_image[num] = self.uiManager.d_tileSet[num]
+                l_image[num] = self.uiManager.d_tile_image_name[num]
 
 
 if __name__ == "__main__":

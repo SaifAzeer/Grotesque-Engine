@@ -12,8 +12,6 @@ class Explorer:
 
         self.l_file_explorer_buttons = []
 
-        self.scroll_area = None
-        
         self.filePath = [] # add here when we browse filePath buttons
         self.currFolderPath = ""
         self.scroll_area = ScrollArea(self.l_file_explorer_buttons,(200,300))

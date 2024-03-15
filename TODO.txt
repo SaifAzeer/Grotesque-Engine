@@ -4,11 +4,6 @@ FEATURES
 -> randomize animation with name ending with "_r"
 -> add key and save button
 
--> Action editor
-    -> find selection
-        -> delete selection
-        -> edit selection/name
-    -> add name and show name on screen
 
 -> undo/redo
 -> remove from selected list by pressing ALT
@@ -27,3 +22,9 @@ FEATURES
 BUGS
 -> tile appear to be saved at top right for unknown reason
 -> Fix delete ALT + Left mouse when moving map
+
+-> Action editor
+    -> find selection
+        -> delete selection
+        -> edit selection/name
+    -> add name and show name on screen

@@ -3,6 +3,7 @@ import os.path as path
 from sys import path as sysPath
 sysPath.append(path.dirname(path.abspath(path.join(__file__ ,"../../"))))
 from pygame import image, Surface,SRCALPHA
+from pygame.sprite import Group as pyGroup
 import json
 #from os import path
 #print(path.dirname(path.realpath(__file__)))
@@ -14,6 +15,7 @@ class Colliders_surface:
 	name :  str
 	surface : Surface
 	grid_position : list[int]
+	size : list[int]
 
 class Deformed_map_reader:
 	def __init__(self,imageLoc):
@@ -25,6 +27,8 @@ class Deformed_map_reader:
 
 		self.animation = Animation.Animation(self.imageLoc)
 		self.d_animations = {} # dict of all animations on map
+		self.l_colliders: list[Colliders_surface] = []
+
 
 	def open_map(self,map) -> None:
 		'''map -> .json file'''
@@ -50,9 +54,11 @@ class Deformed_map_reader:
 		self.map_image_3 = self.get_image_3()
 
 		self.check_image_if_animation()
+		self.instantiate_collider()
 
 	def save_image(self,display):
 		image.save(display,"test.png")
+
 
 	def read_json(self,fileName) -> bool:
 		with open(fileName, 'r') as f:
@@ -60,18 +66,21 @@ class Deformed_map_reader:
 			return True
 		return False
 	
-	def instantiate_collider(self) -> list[Colliders_surface]:
+
+	def instantiate_collider(self) -> None:
 		'''organise colliders info from json into a dataclass'''
-		l_colliders = []
 		for k,v in self.map_collider.items():
 			for i in v:
-				c_s = Colliders_surface(k,Surface((i[1],i[2])),i[0])
-				l_colliders.append(c_s)
-		return l_colliders  
+				size = [i[1],i[2]]
+				surface = Surface([i[1]*self.gridSize[0],i[2]*self.gridSize[0]])
+				c_s = Colliders_surface(k,surface,i[0],size)
+				self.l_colliders.append(c_s)
+
 
 	def display_collider(self,display) -> None:
-		l_colliders = self.instantiate_collider()
-		for i in l_colliders:
+		#l_colliders = self.instantiate_collider()
+		if self.l_colliders == None or self.l_colliders == []: return
+		for i in self.l_colliders:
 			i.surface.fill((100,100,100))
 			display.blit(i.surface,(i.grid_position[0]*self.gridSize[0],i.grid_position[1]*self.gridSize[1]))
 

@@ -1,3 +1,5 @@
+'''TODO -> Add Animation image details in JSON file in add function'''
+
 ''' Manages Animation..  Play, Pause ect...'''
 
 from typing import Dict, List
@@ -20,10 +22,11 @@ class Animation_info():
     tileSize : List[int]
     animation_number : int # amount of animation this picture contains.. move left, idle ..
     animation_order :Dict[Animations_type,int]
+    animation_image : Dict[str,str]
 
 
 class Animation:
-    def __init__(self,imgPathMain) -> None:
+    def __init__(self,imgPathMain="") -> None:
         self.imageType : int # tile or a single image
         self.imagePathMain = imgPathMain
         self.imagePath  = "" # in case image is in sub directory... add it here
@@ -49,15 +52,15 @@ class Animation:
         self.__maxFrame = rowNum
 
 
-    def load_from_json(self,name:str,colName:str):
-        self.__get_json()
+    def load_from_json(self,jsonFileName:str,name:str):
+        self.__get_json(jsonFileName)
         d_info = self.__get_animation_info(name)
+        return d_info
+        #if d_info:
+        #    animationOrder = d_info.animation_order[colName]
+        #    self.load_from_image(name,2,d_info.tileSize)
 
-        if d_info:
-            animationOrder = d_info.animation_order[colName]
-            self.load_from_image(name,2,d_info.tileSize)
-
-
+    
     def load_from_img_calc_gridnumber(self,img:str,tileSize:list[int]):
         '''calculate number of row and col from big image based on tile size and load it'''
         self.__load_image(img)
@@ -73,7 +76,7 @@ class Animation:
 
     # newImage: replace the original image with the newImage to render temporily
     def play(self,display:Surface,position:List[int],newImg = None):
-        '''loop and render animation'''     
+        '''loop and render animation a single long image'''     
         if self.__isPlaying == True:             
             if (time.get_ticks() - self.__lastUpdate) >= self.imageInterval:
                 self.__lastUpdate = time.get_ticks()
@@ -98,13 +101,16 @@ class Animation:
 
 
     def __load_image(self,img):
-        self.image = image.load(self.imagePathMain+"\\"+ img)
+        if self.imagePathMain == "":
+            self.image = image.load(img)
+        else:
+            self.image = image.load(self.imagePathMain+"/" + self.imagePath+ img)
     
 
-    def __get_json(self):
+    def __get_json(self,jsonFileName:str):
         '''get all the info from json file'''
-        for key,value in self.AnimationJson.get_animation().items():
-            __animationInfo = Animation_info(value["tileSize"],value["animationNumber"],value["animationOrder"])
+        for key,value in self.AnimationJson.get_animation(jsonFileName).items():
+            __animationInfo = Animation_info(value["tileSize"],value["animationNumber"],value["animationOrder"],value["images"])
             self.__d_animationInfo[key] = __animationInfo
 
 
@@ -121,4 +127,3 @@ class Animation:
             return self.__d_animationInfo[name].animation_order
         else:# wrong name inputted
             return None
-        
